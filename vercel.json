@@ -2,15 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "ionic.config.js",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "www",
-        "buildCommand": "npm run build"
-      }
+      "src": "www/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
