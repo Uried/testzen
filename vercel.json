@@ -6,7 +6,7 @@
       "use": "@vercel/static-build",
       "config": {
         "distDir": "www",
-        "devCommand": "ionic serve"
+        "buildCommand": "npm run build"
       }
     }
   ],
