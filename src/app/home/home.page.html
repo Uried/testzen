@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="flex justify-center">
   <ion-toolbar>
     <ion-title>
       Lecture de texte
@@ -6,10 +6,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content >
-  <div class="w-96 ml-auto mr-auto">
+<ion-content class="flex flex-col items-center">
+  <div class="w-[25%] mx-auto mt-80">
     <ion-item>
-      <textarea placeholder="Ecrivez quelque chose" class="w-full h-44" [(ngModel)]="textToRead"></textarea>
+      <ion-label position="floating">Texte à lire</ion-label>
+      <ion-input [(ngModel)]="textToRead"></ion-input>
     </ion-item>
 
     <ion-item>
@@ -26,7 +27,12 @@
       </ion-select>
     </ion-item>
 
-    <ion-button expand="full" (click)="speakText()">Lire</ion-button>
-  </div>
+    <ion-button expand="full" (click)="speakText()" [disabled]="speaking">
+      {{ speaking ? 'Pause' : 'Lire' }}
+    </ion-button>
 
+    <ion-button expand="full" (click)="stopSpeech()" [disabled]="!speaking">
+      Arrêter
+    </ion-button>
+  </div>
 </ion-content>
