@@ -1,79 +1,95 @@
 import { Component } from '@angular/core';
 
+declare var responsiveVoice: any;
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  textToRead: string = '';
-  selectedLanguage: string = '';
-  selectedVoice: SpeechSynthesisVoice | null = null;
-  languages: { name: string; lang: string }[];
-  voices: SpeechSynthesisVoice[] = [];
-  speaking: boolean = false;
-  currentSpeech: SpeechSynthesisUtterance | null = null;
+  isPlaying: boolean = false;
+  textToRead!: string;
+  selectedLanguage: string = 'fr-FR';
+  selectedVoice: string = 'French Female';
+  speed: number = 200;
 
-  constructor() {
-    this.languages = [
-      { name: 'English', lang: 'en-US' },
-      { name: 'Français', lang: 'fr-FR' },
-      // Ajoutez d'autres langues selon vos besoins
-    ];
+  voiceOptions: { [key: string]: string[] } = {
+    'fr-FR': ['French Female', 'French Male'],
+    'en-US': ['English Female', 'English Male'],
+    'ja-JP': ['Japanese Female', 'Japanese Male'],
+    'es-ES': ['Spanish Female', 'Spanish Male'],
+    'zh-CN': ['Chinese Female', 'Chinese Male'],
+    'de-DE': ['German Female', 'German Male'],
+    'it-IT': ['Italian Female', 'Italian Male'],
+    // Ajoutez d'autres langues et options de voix selon vos besoins
+  };
+
+
+  speak() {
+    this.isPlaying = !this.isPlaying;
+
+    const ionContent = document.querySelector('ion-content')!;
+    ionContent.classList.add('playing');
+
+    return new Promise<void>((resolve) => {
+      responsiveVoice.speed = this.speed;
+      responsiveVoice.speak(this.textToRead, this.selectedVoice, {
+        onend: () => {
+          this.onEnd();
+          resolve();
+        },
+      });
+    });
+
   }
 
-  ionViewWillEnter() {
-    this.loadVoices();
-  }
-
-  loadVoices() {
-    this.voices = speechSynthesis.getVoices();
-  }
-
-  onLanguageChange() {
-    this.selectedVoice = null;
-    this.voices = speechSynthesis
-      .getVoices()
-      .filter((voice) => voice.lang === this.selectedLanguage);
-  }
-
-  speakText() {
-    if (this.textToRead.trim() === '') {
+  async triggerSpeak() {
+    if (this.isPlaying) {
       return;
     }
 
-    if (this.speaking) {
-      this.pauseSpeech();
-      return;
-    }
+    this.isPlaying = true;
+    const ionContent = document.querySelector('ion-content')!;
+    ionContent.classList.add('playing');
 
-    const speech = new SpeechSynthesisUtterance();
-    speech.text = this.textToRead;
-    speech.lang = this.selectedLanguage;
-    speech.voice = this.selectedVoice;
-    this.currentSpeech = speech;
-    this.speaking = true;
+    await this.speak();
 
-    speechSynthesis.speak(speech);
-
-    speech.onend = () => {
-      this.speaking = false;
-      this.currentSpeech = null;
-    };
+    this.isPlaying = false;
+    ionContent.classList.remove('playing');
   }
 
-  pauseSpeech() {
-    if (this.currentSpeech && this.speaking) {
-      speechSynthesis.pause();
-      this.speaking = false;
-    }
+  onStart(): void {
+    responsiveVoice.setVoice(this.selectedVoice);
+    responsiveVoice.setLanguage(this.selectedLanguage);
   }
 
-  stopSpeech() {
-    if (this.currentSpeech) {
-      speechSynthesis.cancel();
-      this.speaking = false;
-      this.currentSpeech = null;
+  onEnd() {
+    !this.isPlaying
+
+    const ionContent = document.querySelector('ion-content')!;
+
+    ionContent.classList.remove('playing');
+  }
+
+  pause(): void {
+    this.isPlaying = false;
+    const ionContent = document.querySelector('ion-content')!;
+    if (this.isPlaying) {
+      ionContent.classList.add('playing');
+    } else {
+      ionContent.classList.remove('playing');
     }
+
+    responsiveVoice.pause();
+  }
+
+  stop(): void {
+    this.isPlaying = false;
+    const ionContent = document.querySelector('ion-content')!;
+
+    ionContent.classList.remove('playing');
+
+    responsiveVoice.cancel();
   }
 }

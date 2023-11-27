@@ -1,38 +1,52 @@
-<ion-header class="flex justify-center">
-  <ion-toolbar>
-    <ion-title>
-      Lecture de texte
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content class="flex flex-col items-center">
-  <div class="w-[25%] mx-auto mt-80">
-    <ion-item>
-      <ion-label position="floating">Texte à lire</ion-label>
-      <ion-input [(ngModel)]="textToRead"></ion-input>
-    </ion-item>
 
-    <ion-item>
-      <ion-label>Langue</ion-label>
-      <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()">
-        <ion-select-option *ngFor="let language of languages" [value]="language.lang">{{ language.name }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+<ion-content class="" >
 
-    <ion-item>
-      <ion-label>Voix</ion-label>
-      <ion-select [(ngModel)]="selectedVoice">
-        <ion-select-option *ngFor="let voice of voices" [value]="voice">{{ voice.name }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+  <div class="ml-auto mr-auto w-[95%] md:w-[20%] rounded-md mt-20 border border-solid border-yellow-400 border-3  h-[80%] md:h-[45%]">
+    <div class="ml-auto rounded-tl-md rounded-tr-md mr-auto w-full h-[70%] bg-white text-black">
+      <ion-textarea class="w-full h-full" placeholder="Write your text here" [(ngModel)]="textToRead" rows="6"></ion-textarea>
+    </div>
 
-    <ion-button expand="full" (click)="speakText()" [disabled]="speaking">
-      {{ speaking ? 'Pause' : 'Lire' }}
-    </ion-button>
+    <div class="flex md:w-96 items-center justify-center gap-8 mt-2">
+      <i class="text-2xl text-yellow-400 fas fa-save"></i>
+      <button class="read w-16 bg-yellow-400 text-black h-16 rounded-full" expand="full" (click)="speak()">
+        <i class="fas" [ngClass]="{'fa-play': !isPlaying, 'fa-pause': isPlaying, 'text-2xl': true}"></i>
+      </button>
+      <i class="fas fa-share"></i>
+    </div>
 
-    <ion-button expand="full" (click)="stopSpeech()" [disabled]="!speaking">
-      Arrêter
-    </ion-button>
+
+    <!-- <div class="ml-6">
+      <div class="md:w-80 ml-auto mr-auto mt-2">
+        <label class="font-extrabold" position="stacked">Voix: </label>
+        <select class="w-[55%]" [(ngModel)]="selectedVoice">
+          <ng-container *ngFor="let voice of voiceOptions[selectedLanguage]">
+            <option [value]="voice">{{ voice }}</option>
+          </ng-container>
+        </select>
+      </div> -->
+
+
+      <!-- <div class="md:w-80 mr-auto ml-auto font-extrabold mt-2 ">
+        <label position="stacked">Langue:</label>
+        <select class="w-[55%]" [(ngModel)]="selectedLanguage">
+          <option value="fr-FR">Français</option>
+          <option value="en-GB">Anglais</option>
+          <option value="ja-JP">Japonais</option>
+          <option value="es-ES">Espagnol</option>
+          <option value="zh-CN">Chinois</option>
+          <option value="de-DE">Allemand</option>
+          <option value="it-IT">Italien</option>
+        </select>
+      </div> -->
+
   </div>
+
+
+  <!-- <ion-item>
+    <ion-label position="stacked">Vitesse de lecture</ion-label>
+    <ion-range [(ngModel)]="speed" min="50" max="200" step="10"></ion-range>
+  </ion-item> -->
+
+
 </ion-content>
