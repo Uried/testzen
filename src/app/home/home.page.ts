@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 declare var responsiveVoice: any;
 
@@ -9,10 +11,32 @@ declare var responsiveVoice: any;
 })
 export class HomePage {
   isPlaying: boolean = false;
+  title!: string;
   textToRead!: string;
+  isPublic: boolean = false;
+  isDivVisible = false;
+  isPublicDivVisible = false;
   selectedLanguage: string = 'fr-FR';
   selectedVoice: string = 'French Female';
   speed: number = 200;
+  texts: any[] = [];
+
+  isLanguageSelectionVisible = false;
+
+  constructor(private router: Router, private http: HttpClient) {}
+
+  ngOnInit() {
+    try {
+      this.http.get('http://localhost:5800/texts/').subscribe((data: any) => {
+        this.texts = data.data;
+        this.texts.forEach((text: any) => {
+          console.log(text);
+        });
+      });
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
 
   voiceOptions: { [key: string]: string[] } = {
     'fr-FR': ['French Female', 'French Male'],
@@ -25,12 +49,47 @@ export class HomePage {
     // Ajoutez d'autres langues et options de voix selon vos besoins
   };
 
+  setTextToRead(content: string): void {
+    this.textToRead = content;
+  }
+
+  addNewText() {
+    this.textToRead = '';
+  }
+
+  saveNewText() {
+    let text = {
+      title: this.title,
+      content: this.textToRead,
+    };
+    try {
+      this.http.post('http://localhost:5800/texts/', text).subscribe((res) => {
+        console.log('Saved');
+      });
+    } catch (error: any) {
+      console.log(error.message);
+    }
+    this.isDivVisible = !this.isDivVisible;
+  }
+
+  saveNewPublicText() {
+    let text = {
+      title: this.title,
+      content: this.textToRead,
+      isPublic: (this.isPublic = true),
+    };
+    try {
+      this.http.post('http://localhost:5800/texts/', text).subscribe((res) => {
+        console.log('Saved');
+      });
+    } catch (error: any) {
+      console.log(error.message);
+    }
+    this.isPublicDivVisible = !this.isPublicDivVisible;
+  }
 
   speak() {
     this.isPlaying = !this.isPlaying;
-
-    const ionContent = document.querySelector('ion-content')!;
-    ionContent.classList.add('playing');
 
     return new Promise<void>((resolve) => {
       responsiveVoice.speed = this.speed;
@@ -41,7 +100,22 @@ export class HomePage {
         },
       });
     });
+  }
 
+  toggleLanguageSelection() {
+    this.isLanguageSelectionVisible = !this.isLanguageSelectionVisible;
+  }
+
+  writeTitle() {
+    // Handle input click event if needed
+  }
+
+  toggleDivVisibility() {
+    this.isDivVisible = !this.isDivVisible;
+  }
+
+  togglePublicDivVisibility() {
+    this.isPublicDivVisible = !this.isPublicDivVisible;
   }
 
   async triggerSpeak() {
@@ -50,13 +124,11 @@ export class HomePage {
     }
 
     this.isPlaying = true;
-    const ionContent = document.querySelector('ion-content')!;
-    ionContent.classList.add('playing');
+
 
     await this.speak();
 
     this.isPlaying = false;
-    ionContent.classList.remove('playing');
   }
 
   onStart(): void {
@@ -65,30 +137,18 @@ export class HomePage {
   }
 
   onEnd() {
-    !this.isPlaying
+    this.isPlaying = false;
 
-    const ionContent = document.querySelector('ion-content')!;
-
-    ionContent.classList.remove('playing');
   }
 
   pause(): void {
     this.isPlaying = false;
-    const ionContent = document.querySelector('ion-content')!;
-    if (this.isPlaying) {
-      ionContent.classList.add('playing');
-    } else {
-      ionContent.classList.remove('playing');
-    }
 
     responsiveVoice.pause();
   }
 
   stop(): void {
     this.isPlaying = false;
-    const ionContent = document.querySelector('ion-content')!;
-
-    ionContent.classList.remove('playing');
 
     responsiveVoice.cancel();
   }

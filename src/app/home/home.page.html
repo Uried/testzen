@@ -1,52 +1,53 @@
+<ion-content class="">
 
-
-<ion-content class="" >
-
-  <div class="ml-auto mr-auto w-[95%] md:w-[20%] rounded-md mt-20 border border-solid border-yellow-400 border-3  h-[80%] md:h-[45%]">
-    <div class="ml-auto rounded-tl-md rounded-tr-md mr-auto w-full h-[70%] bg-white text-black">
-      <ion-textarea class="w-full h-full" placeholder="Write your text here" [(ngModel)]="textToRead" rows="6"></ion-textarea>
-    </div>
-
-    <div class="flex md:w-96 items-center justify-center gap-8 mt-2">
-      <i class="text-2xl text-yellow-400 fas fa-save"></i>
-      <button class="read w-16 bg-yellow-400 text-black h-16 rounded-full" expand="full" (click)="speak()">
-        <i class="fas" [ngClass]="{'fa-play': !isPlaying, 'fa-pause': isPlaying, 'text-2xl': true}"></i>
-      </button>
-      <i class="fas fa-share"></i>
-    </div>
-
-
-    <!-- <div class="ml-6">
-      <div class="md:w-80 ml-auto mr-auto mt-2">
-        <label class="font-extrabold" position="stacked">Voix: </label>
-        <select class="w-[55%]" [(ngModel)]="selectedVoice">
-          <ng-container *ngFor="let voice of voiceOptions[selectedLanguage]">
-            <option [value]="voice">{{ voice }}</option>
-          </ng-container>
-        </select>
-      </div> -->
-
-
-      <!-- <div class="md:w-80 mr-auto ml-auto font-extrabold mt-2 ">
-        <label position="stacked">Langue:</label>
-        <select class="w-[55%]" [(ngModel)]="selectedLanguage">
-          <option value="fr-FR">Français</option>
-          <option value="en-GB">Anglais</option>
-          <option value="ja-JP">Japonais</option>
-          <option value="es-ES">Espagnol</option>
-          <option value="zh-CN">Chinois</option>
-          <option value="de-DE">Allemand</option>
-          <option value="it-IT">Italien</option>
-        </select>
-      </div> -->
+  <div class="flex fixed h-12 w-full">
+    <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div> <i
+      class="text-blue-800 text-3xl ml-[38%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
+    <i class="text-2xl text-blue-800 ml-auto mr-7 mt-2 fas fa-bars"></i>
 
   </div>
+  <ng-container *ngIf="isDivVisible">
+    <div class="fixed w-72 h-36 mt-44 ml-10 rounded-md bg-[#000070] z-50">
+      <label class="ml-5 font-extrabold" for="">Titre</label><br />
+      <input [(ngModel)]="title"
+        class="bg-white text-xl rounded-md focus:border border-yellow-400 border-2 text-black w-[85%] ml-5 mt-3"
+        type="text" (click)="writeTitle()">
+      <button class="bg-yellow-400 ml-[33%] w-28 rounded-md text-black font-extrabold py-2 mt-5"
+        (click)="saveNewText()">Sauvegarder</button>
+    </div>
+  </ng-container>
 
+  <ng-container *ngIf="isPublicDivVisible">
+    <div class="fixed w-72 h-36 mt-44 ml-10 rounded-md bg-[#000070] z-50">
+      <label class="ml-5 font-extrabold" for="">Titre</label><br />
+      <input [(ngModel)]="title"
+        class="bg-white text-xl rounded-md focus:border border-yellow-400 border-2 text-black w-[85%] ml-5 mt-3"
+        type="text" (click)="writeTitle()">
+      <button class="bg-yellow-400 ml-[33%] w-28 rounded-md text-black font-extrabold py-2 mt-5"
+        (click)="saveNewPublicText()">Sauvegarder</button>
+    </div>
+  </ng-container>
 
-  <!-- <ion-item>
-    <ion-label position="stacked">Vitesse de lecture</ion-label>
-    <ion-range [(ngModel)]="speed" min="50" max="200" step="10"></ion-range>
-  </ion-item> -->
+  <div class="txt-cntnt fixed mr-3 rounded-md border border-solid border-yellow-400 border-3 w-[95%] h-[50%] mt-20">
+    <div class="ml-auto rounded-tl-md rounded-tr-md mr-auto w-full h-[75%] bg-white text-black"> <ion-textarea
+        class="w-full h-full" [(ngModel)]="textToRead" placeholder="Write your text here" [(ngModel)]="textToRead"
+        rows="6"></ion-textarea> </div>
 
-
+    <div class="flex w-full md:w-96 items-center justify-center gap-10 mt-2">
+      <i class="text-2xl text-yellow-400 fas fa-save" (click)="writeTitle()" (click)="toggleDivVisibility()"></i>
+      <button class="read w-16 bg-yellow-400 text-black h-16 ml-7 rounded-full" expand="full" (click)="speak()">
+        <i class="fas" [ngClass]="{'fa-play': !isPlaying, 'fa-pause': isPlaying, 'text-2xl': true}"></i>
+      </button>
+      <i class="text-2xl text-yellow-400 fas fa-paper-plane" (click)="togglePublicDivVisibility()"></i>
+      <i class="text-2xl text-yellow-400 fas fa-plus" (click)="addNewText()"></i>
+    </div>
+  </div>
+  <div class="pt-[109%] bg-transparent h-full w-[95%] ml-auto mr-auto">
+    <div *ngFor="let text of texts">
+      <div class="rounded-md flex bg-yellow-300 hover:cursor-pointer h-10 text-black my-2 font-extrabold py-2"
+        (click)="setTextToRead(text.content)">
+        <p class="ml-4">{{text.title}}</p><i class="ml-auto mr-5 text-xl fas fa-ellipsis-v"></i>
+      </div>
+    </div>
+  </div>
 </ion-content>
