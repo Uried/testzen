@@ -31,7 +31,7 @@ export class HomePage {
   ngOnInit() {
     try {
       this.http
-        .get('https://apitest-du6cmsqmr-uried.vercel.app/texts/')
+        .get('https://apitest-psi.vercel.app/texts/')
         .subscribe((data: any) => {
           this.texts = data.data;
           this.texts.forEach((text: any) => {
@@ -69,7 +69,7 @@ export class HomePage {
     };
     try {
       this.http
-        .post('https://apitest-du6cmsqmr-uried.vercel.app/texts/', text)
+        .post('https://apitest-psi.vercel.app/texts/', text)
         .subscribe((res) => {
           console.log('Saved');
         });
@@ -87,7 +87,7 @@ export class HomePage {
     };
     try {
       this.http
-        .post('https://apitest-du6cmsqmr-uried.vercel.app/texts/', text)
+        .post('https://apitest-psi.vercel.app/texts/', text)
         .subscribe((res) => {
           console.log('Saved');
         });
