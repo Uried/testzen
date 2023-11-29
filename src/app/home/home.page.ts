@@ -1,6 +1,7 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+
 
 declare var responsiveVoice: any;
 
@@ -11,6 +12,8 @@ declare var responsiveVoice: any;
 })
 export class HomePage {
   isPlaying: boolean = false;
+  isOpenMenu: boolean = false;
+  isOptionsOpen: boolean = false;
   title!: string;
   textToRead!: string;
   isPublic: boolean = false;
@@ -27,12 +30,14 @@ export class HomePage {
 
   ngOnInit() {
     try {
-      this.http.get('http://localhost:5800/texts/').subscribe((data: any) => {
-        this.texts = data.data;
-        this.texts.forEach((text: any) => {
-          console.log(text);
+      this.http
+        .get('https://apitest-du6cmsqmr-uried.vercel.app/texts/')
+        .subscribe((data: any) => {
+          this.texts = data.data;
+          this.texts.forEach((text: any) => {
+            console.log(text);
+          });
         });
-      });
     } catch (error: any) {
       console.log(error.message);
     }
@@ -63,9 +68,11 @@ export class HomePage {
       content: this.textToRead,
     };
     try {
-      this.http.post('http://localhost:5800/texts/', text).subscribe((res) => {
-        console.log('Saved');
-      });
+      this.http
+        .post('https://apitest-du6cmsqmr-uried.vercel.app/texts/', text)
+        .subscribe((res) => {
+          console.log('Saved');
+        });
     } catch (error: any) {
       console.log(error.message);
     }
@@ -79,9 +86,11 @@ export class HomePage {
       isPublic: (this.isPublic = true),
     };
     try {
-      this.http.post('http://localhost:5800/texts/', text).subscribe((res) => {
-        console.log('Saved');
-      });
+      this.http
+        .post('https://apitest-du6cmsqmr-uried.vercel.app/texts/', text)
+        .subscribe((res) => {
+          console.log('Saved');
+        });
     } catch (error: any) {
       console.log(error.message);
     }
@@ -102,8 +111,23 @@ export class HomePage {
     });
   }
 
+  openMenu() {
+    this.isOpenMenu = !this.isOpenMenu;
+  }
+
   toggleLanguageSelection() {
     this.isLanguageSelectionVisible = !this.isLanguageSelectionVisible;
+  }
+
+  closeModals(){
+    this.isOpenMenu = false;
+    this.isOptionsOpen = false;
+    this.isPublicDivVisible = false;
+  }
+
+  optionsTextOpen(event: MouseEvent) {
+    event.stopPropagation();
+    this.isOptionsOpen = !this.isOptionsOpen;
   }
 
   writeTitle() {
@@ -125,7 +149,6 @@ export class HomePage {
 
     this.isPlaying = true;
 
-
     await this.speak();
 
     this.isPlaying = false;
@@ -138,7 +161,6 @@ export class HomePage {
 
   onEnd() {
     this.isPlaying = false;
-
   }
 
   pause(): void {

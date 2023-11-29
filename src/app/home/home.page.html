@@ -1,11 +1,31 @@
-<ion-content class="">
+<ion-content class="h-full">
 
   <div class="flex fixed h-12 w-full">
-    <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div> <i
-      class="text-blue-800 text-3xl ml-[38%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
-    <i class="text-2xl text-blue-800 ml-auto mr-7 mt-2 fas fa-bars"></i>
-
+    <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div>
+    <i class="text-blue-800 text-3xl ml-[38%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
+    <i class="fas"
+      [ngClass]="{'fa-bars': !isOpenMenu, 'fa-times': isOpenMenu, 'text-2xl text-blue-800 mt-2 ml-7': true}"
+      (click)="openMenu()"></i>
   </div>
+
+  <div *ngIf="isOpenMenu"
+    class="fixed right-0 mt-10 w-40 h-36 rounded-br-md rounded-bl-md bg-[#000070] z-30"
+    [ngClass]="{'translate-x-0': isOpenMenu, '-translate-x-full': !isOpenMenu}">
+    <div class="flex mt-4 ml-2 gap-3">
+      <i class="text-white fas fa-history py-1"></i>
+      <p class="font-bold text-white">Historique</p>
+    </div>
+    <div class="flex mt-4 ml-2 gap-3">
+      <i class="text-white fas fa-cogs py-1"></i>
+      <p class="font-bold text-white">Paramètres</p>
+    </div>
+    <div class="flex mt-4 ml-2 gap-3">
+      <i class="text-red-600 fas fa-sign-out-alt py-1"></i>
+      <p class="font-bold text-white">Déconnexion</p>
+    </div>
+  </div>
+
+
   <ng-container *ngIf="isDivVisible">
     <div class="fixed w-72 h-36 mt-44 ml-10 rounded-md bg-[#000070] z-50">
       <label class="ml-5 font-extrabold" for="">Titre</label><br />
@@ -28,26 +48,40 @@
     </div>
   </ng-container>
 
-  <div class="txt-cntnt fixed mr-3 rounded-md border border-solid border-yellow-400 border-3 w-[95%] h-[50%] mt-20">
+  <div
+    class="txt-cntnt fixed rounded-md border border-solid ml-[2.5%] border-yellow-400 border-3 w-[95%] h-[50%] mt-[18%]">
     <div class="ml-auto rounded-tl-md rounded-tr-md mr-auto w-full h-[75%] bg-white text-black"> <ion-textarea
         class="w-full h-full" [(ngModel)]="textToRead" placeholder="Write your text here" [(ngModel)]="textToRead"
-        rows="6"></ion-textarea> </div>
+        rows="6" (click)="closeModals()"></ion-textarea> </div>
 
     <div class="flex w-full md:w-96 items-center justify-center gap-10 mt-2">
       <i class="text-2xl text-yellow-400 fas fa-save" (click)="writeTitle()" (click)="toggleDivVisibility()"></i>
-      <button class="read w-16 bg-yellow-400 text-black h-16 ml-7 rounded-full" expand="full" (click)="speak()">
+      <button class="read w-16 bg-yellow-400 text-black h-16 ml-6 rounded-full" expand="full" (click)="speak()">
         <i class="fas" [ngClass]="{'fa-play': !isPlaying, 'fa-pause': isPlaying, 'text-2xl': true}"></i>
       </button>
       <i class="text-2xl text-yellow-400 fas fa-paper-plane" (click)="togglePublicDivVisibility()"></i>
       <i class="text-2xl text-yellow-400 fas fa-plus" (click)="addNewText()"></i>
     </div>
   </div>
-  <div class="pt-[109%] bg-transparent h-full w-[95%] ml-auto mr-auto">
-    <div *ngFor="let text of texts">
-      <div class="rounded-md flex bg-yellow-300 hover:cursor-pointer h-10 text-black my-2 font-extrabold py-2"
-        (click)="setTextToRead(text.content)">
-        <p class="ml-4">{{text.title}}</p><i class="ml-auto mr-5 text-xl fas fa-ellipsis-v"></i>
+
+  <div *ngIf="isOptionsOpen" class="fixed w-32 h-32 bg-[#000070] right-12 mt-[108%] rounded-md font-extrabold z-30">
+    <div class="ml-4">
+      <p class="mt-3">Lire</p>
+      <p class="mt-3">Publier</p>
+      <p class="mt-3 text-red-600">Supprimer</p>
+    </div>
+  </div>
+
+  <div class="bg-transparent mt-[107%] h-[50%] w-[95%] ml-auto mr-auto">
+    <div class="h-full overflow-y-scroll">
+      <div *ngFor="let text of texts" class="custom-scroll-item">
+        <div class="rounded-md flex bg-yellow-300 hover:cursor-pointer h-10 text-black my-2 font-extrabold py-2"
+          (click)="setTextToRead(text.content)" (click)="closeModals()">
+          <p class="ml-4">{{text.title}}</p>
+          <i class="relative ml-auto mr-5 text-xl fas fa-ellipsis-v" (click)="optionsTextOpen($event)" ></i>
+        </div>
       </div>
     </div>
   </div>
+
 </ion-content>
