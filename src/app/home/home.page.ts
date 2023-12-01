@@ -1,7 +1,6 @@
-import { Component} from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-
 
 declare var responsiveVoice: any;
 
@@ -23,36 +22,52 @@ export class HomePage {
   selectedVoice: string = 'French Female';
   speed: number = 200;
   texts: any[] = [];
-
+  showLanguageSelection = false;
   isLanguageSelectionVisible = false;
 
   constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit() {
-    try {
-      this.http
-        .get('https://apitest-psi.vercel.app/texts/')
-        .subscribe((data: any) => {
-          this.texts = data.data;
-          this.texts.forEach((text: any) => {
-            console.log(text);
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      // Rediriger vers /login
+      window.location.href = '/login';
+    } else {
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+
+      try {
+        this.http
+          .get('https://apitest-psi.vercel.app/texts', { headers })
+          .subscribe((data: any) => {
+            this.texts = data.data;
+            this.texts.forEach((text: any) => {
+              console.log(text);
+            });
           });
-        });
-    } catch (error: any) {
-      console.log(error.message);
+      } catch (error: any) {
+        console.log(error.message);
+      }
     }
   }
 
-  voiceOptions: { [key: string]: string[] } = {
-    'fr-FR': ['French Female', 'French Male'],
-    'en-US': ['English Female', 'English Male'],
-    'ja-JP': ['Japanese Female', 'Japanese Male'],
-    'es-ES': ['Spanish Female', 'Spanish Male'],
-    'zh-CN': ['Chinese Female', 'Chinese Male'],
-    'de-DE': ['German Female', 'German Male'],
-    'it-IT': ['Italian Female', 'Italian Male'],
-    // Ajoutez d'autres langues et options de voix selon vos besoins
-  };
+  onLanguageChange() {
+    // Modifier la voix en fonction de la langue sélectionnée
+    switch (this.selectedLanguage) {
+      case 'fr-FR':
+        this.selectedVoice = 'French Female';
+        break;
+      case 'en-US':
+        this.selectedVoice = 'US English Female';
+        break;
+      // Ajoutez d'autres cas pour les autres langues
+    }
+
+    responsiveVoice.setVoice(this.selectedVoice);
+    responsiveVoice.setLanguage(this.selectedLanguage);
+  }
 
   setTextToRead(content: string): void {
     this.textToRead = content;
@@ -116,10 +131,10 @@ export class HomePage {
   }
 
   toggleLanguageSelection() {
-    this.isLanguageSelectionVisible = !this.isLanguageSelectionVisible;
+    this.showLanguageSelection = !this.showLanguageSelection;
   }
 
-  closeModals(){
+  closeModals() {
     this.isOpenMenu = false;
     this.isOptionsOpen = false;
     this.isPublicDivVisible = false;
@@ -155,6 +170,17 @@ export class HomePage {
   }
 
   onStart(): void {
+    // Modifier la voix en fonction de la langue sélectionnée
+    switch (this.selectedLanguage) {
+      case 'fr-FR':
+        this.selectedVoice = 'French Female';
+        break;
+      case 'en-US':
+        this.selectedVoice = 'US English Female';
+        break;
+      // Ajoutez d'autres cas pour les autres langues
+    }
+
     responsiveVoice.setVoice(this.selectedVoice);
     responsiveVoice.setLanguage(this.selectedLanguage);
   }

@@ -4,15 +4,16 @@
         <div class="shape"></div>
     </div>
     <form class="w-[90%]">
-        <h3>Login Here</h3>
+        <h3>Connexion</h3>
 
-        <label for="username">Username</label>
-        <input type="text" placeholder="Email or Phone" id="username">
+        <label for="username">Pseudo</label>
+        <input name="pseudo" [(ngModel)]="pseudo" type="text" placeholder="Email or Phone" id="username">
 
-        <label for="password">Password</label>
-        <input type="password" placeholder="Password" id="password">
+        <label for="password">Numero de telephone</label>
+        <input name="phone" [(ngModel)]="phone" type="tel" placeholder="Password" id="password">
 
-        <button (click)="login()" >Log In</button>
+        <button (click)="login(pseudo,phone)" >Se connecter</button>
+        <button (click)="login(pseudo,phone)">Se connecter avec Ayoba</button>
 
     </form>
 </ion-content>

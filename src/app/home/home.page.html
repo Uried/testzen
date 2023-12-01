@@ -1,11 +1,19 @@
-<ion-content class="h-full">
+<ion-content class="h-full overflow-hidden">
 
   <div class="flex fixed h-12 w-full">
     <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div>
-    <i class="text-blue-800 text-3xl ml-[38%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
+    <i class="text-blue-800 text-2xl ml-[20%] mt-3 fas fa-search"></i>
+    <i class="text-blue-800 text-3xl ml-[10%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
     <i class="fas"
-      [ngClass]="{'fa-bars': !isOpenMenu, 'fa-times': isOpenMenu, 'text-2xl text-blue-800 mt-2 ml-7': true}"
+      [ngClass]="{'fa-bars': !isOpenMenu, 'fa-times': isOpenMenu, 'text-2xl text-blue-800 mt-2 ml-10': true}"
       (click)="openMenu()"></i>
+  </div>
+
+  <div class="language-selection mt-7 ml-[64%] max-w-[25%] fixed">
+    <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()" class="text-blue-900">
+      <ion-select-option value="fr-FR">Français</ion-select-option>
+      <ion-select-option value="en-US">English</ion-select-option>
+    </ion-select>
   </div>
 
   <div *ngIf="isOpenMenu"
@@ -78,7 +86,7 @@
         <div class="rounded-md flex bg-yellow-300 hover:cursor-pointer h-10 text-black my-2 font-extrabold py-2"
           (click)="setTextToRead(text.content)" (click)="closeModals()">
           <p class="ml-4">{{text.title}}</p>
-          <i class="relative ml-auto mr-5 text-xl fas fa-ellipsis-v" (click)="optionsTextOpen($event)" ></i>
+          <i class="ml-auto mr-5 text-xl fas fa-ellipsis-v" (click)="optionsTextOpen($event)" ></i>
         </div>
       </div>
     </div>

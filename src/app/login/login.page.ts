@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { tap, catchError,map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -9,30 +10,54 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-
-  username!: string;
-  password!: string;
+  pseudo!: string;
+  phone!: string;
+  jId!: string;
 
   constructor(
-    private router: Router,
-    //private http: HttpClient
-   ) { }
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    this.route.queryParams.subscribe((params) => {
+      this.pseudo = params['pseudo'];
+      this.phone = params['phone'];
+      this.jId = params['jId'];
+    });
 
-
+    if (this.jId && this.phone && this.pseudo) {
+      this.login(this.pseudo, this.phone);
+    } else {
+      this.router.navigateByUrl('/login');
+    }
   }
 
-  login(){
-    this.router.navigateByUrl('/home');
-    console.log("fxykcutlyfgiuh");
+  login(pseudo: string, phone: string) {
+    let credentials = {
+      pseudo: this.pseudo,
+      phone: this.phone,
+    };
 
+    this.authService
+      .login(credentials)
+      .pipe(
+        map((res) => res.token), // Extraction du token de la réponse
+        tap((token) => {
+          if (token) {
+            localStorage.setItem('token', token); // Sauvegarde du token dans le localStorage
+            this.router.navigateByUrl('/home', { replaceUrl: true });
+            console.log('Connected');
+          } else {
+            console.log('Token not found in the response.');
+          }
+        }),
+        catchError((error) => {
+          console.log(error.message);
+          return throwError(() => error);
+        })
+      )
+      .subscribe();
   }
-
-  redirectTo(urlChemin: string) {
-
-    this.router.navigate([urlChemin]).then(x=>console.log(x));
-    // this.router.navigateByUrl(urlChemin);
-  }
-
 }
