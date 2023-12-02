@@ -32,7 +32,7 @@ export class LoginPage implements OnInit {
     } else {
       this.router.navigateByUrl('/login');
     }
-  }
+   }
 
   login(pseudo: string, phone: string) {
     let credentials = {
