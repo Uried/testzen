@@ -3,7 +3,7 @@
   "builds": [
     {
       "src": "ionic.config.js",
-      "use": "@vercel/static-build",
+      "use": "@vercel/ionic",
       "config": {
         "distDir": "./www",
         "buildCommand": "npm run build"
