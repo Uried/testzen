@@ -1,23 +1,46 @@
 <ion-content class="h-full overflow-hiddenc">
 
-  <div class="flex fixed h-12 w-full">
+  <div class="flex fixed h-12 w-full text-blue-800">
     <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div>
-    <i class="text-blue-800 text-2xl ml-[20%] mt-3 fas fa-search"></i>
-    <i class="text-blue-800 text-3xl ml-[10%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
+    <input class="hidden mt-3 rounded-full bg-white md:flex ml-[42%]" type="text">
+    <i class="text-blue-800 text-2xl ml-[20%] md:ml-[3%] mt-3 fas fa-search"></i>
+    <i class="text-blue-800 text-3xl md:ml-[10%] ml-[10%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
+    <div class="md:flex md:mt-3 md:gap-8 md:ml-[5%] font-bold hidden">
+      <p class="">Historique</p>
+      <p class="">Parametres</p>
+      <p class="text-red-700">Déconnexion</p>
+    </div>
+
     <i class="fas"
-      [ngClass]="{'fa-bars': !isOpenMenu, 'fa-times': isOpenMenu, 'text-2xl text-blue-800 mt-2 ml-10': true}"
+      [ngClass]="{'fa-bars': !isOpenMenu, 'fa-times': isOpenMenu, 'text-2xl md:hidden text-blue-800 mt-2 ml-10': true}"
       (click)="openMenu()"></i>
   </div>
 
-  <div class="language-selection mt-7 ml-[64%] max-w-[25%] fixed">
+  <div class="language-selection mt-5 ml-[64%] md:ml-[72.5%]  max-w-[25%] fixed">
     <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()" class="text-blue-900">
       <ion-select-option value="fr-FR">Français</ion-select-option>
       <ion-select-option value="en-US">English</ion-select-option>
+      <ion-select-option value="es-ES">Español</ion-select-option>
+      <ion-select-option value="de-DE">Deutsch</ion-select-option>
+      <ion-select-option value="ja-JP">Japanese</ion-select-option>
+      <ion-select-option value="zh-CN">Chinese</ion-select-option>
+      <ion-select-option value="it-IT">Italiano</ion-select-option>
+      <ion-select-option value="nl-NL">Nederlands</ion-select-option>
+      <ion-select-option value="pt-BR">Português</ion-select-option>
+      <ion-select-option value="ru-RU">Русский</ion-select-option>
+      <ion-select-option value="sv-SE">Svenska</ion-select-option>
+      <ion-select-option value="da-DK">Dansk</ion-select-option>
+      <ion-select-option value="nb-NO">Norsk</ion-select-option>
+      <ion-select-option value="fi-FI">Suomi</ion-select-option>
+      <ion-select-option value="pl-PL">Polski</ion-select-option>
+      <ion-select-option value="tr-TR">Türkçe</ion-select-option>
+      <ion-select-option value="el-GR">Ελληνικά</ion-select-option>
+      <ion-select-option value="hu-HU">Magyar</ion-select-option>
+      <ion-select-option value="cs-CZ">Čeština</ion-select-option>
     </ion-select>
   </div>
 
-  <div *ngIf="isOpenMenu"
-    class="fixed right-0 mt-10 w-40 h-36 rounded-br-md rounded-bl-md bg-[#000070] z-30"
+  <div *ngIf="isOpenMenu" class="fixed right-0 mt-10 w-40 h-36 rounded-br-md rounded-bl-md bg-[#000070] z-30"
     [ngClass]="{'translate-x-0': isOpenMenu, '-translate-x-full': !isOpenMenu}">
     <div class="flex mt-4 ml-2 gap-3">
       <i class="text-white fas fa-history py-1"></i>
@@ -35,29 +58,35 @@
 
 
   <ng-container *ngIf="isDivVisible">
-    <div class="fixed w-72 h-36 mt-44 ml-10 rounded-md bg-[#000070] z-50">
+    <div class="fixed w-72 h-36 mt-44 ml-10 rounded-md bg-[#000070] border border-solid border-yellow-400 border-3 z-50">
       <label class="ml-5 font-extrabold" for="">Titre</label><br />
       <input [(ngModel)]="title"
         class="bg-white text-xl rounded-md focus:border border-yellow-400 border-2 text-black w-[85%] ml-5 mt-3"
         type="text" (click)="writeTitle()">
-      <button class="bg-yellow-400 ml-[33%] w-28 rounded-md text-black font-extrabold py-2 mt-5"
-        (click)="saveNewText()">Sauvegarder</button>
+      <div class="h-[1px] w-full bg-yellow-400 mt-5"></div>
+      <div class="flex gap-24 ml-6 mt-3 text-[98%] font-bold">
+        <button class="text-red-700" (click)="closeSaveNewTextModal()">Annuler</button>
+        <button (click)="saveNewText()">Sauvegarder</button>
+      </div>
     </div>
   </ng-container>
 
   <ng-container *ngIf="isPublicDivVisible">
-    <div class="fixed w-72 h-36 mt-44 ml-10 rounded-md bg-[#000070] z-50">
+    <div class="fixed w-72 h-36 mt-44 ml-10 rounded-md bg-[#000070] border border-solid border-yellow-400 border-3 z-50">
       <label class="ml-5 font-extrabold" for="">Titre</label><br />
       <input [(ngModel)]="title"
-        class="bg-white text-xl rounded-md focus:border border-yellow-400 border-2 text-black w-[85%] ml-5 mt-3"
-        type="text" (click)="writeTitle()">
-      <button class="bg-yellow-400 ml-[33%] w-28 rounded-md text-black font-extrabold py-2 mt-5"
-        (click)="saveNewPublicText()"></button>
+        class="bg-white text-xl rounded-md focus:border border-yellow-400 border-2 text-black w-[85%] ml-5 mt-3" type="text"
+        (click)="writeTitle()">
+      <div class="h-[1px] w-full bg-yellow-400 mt-5"></div>
+      <div class="flex gap-24 ml-6 mt-3 text-[98%] font-bold">
+        <button class="text-red-700" (click)="closeSaveNewPublicTextModal()">Annuler</button>
+        <button (click)="saveNewPublicText()">Sauvegarder</button>
+      </div>
     </div>
   </ng-container>
 
   <div
-    class="txt-cntnt fixed rounded-md border border-solid ml-[2.5%] border-yellow-400 border-3 w-[95%] h-[45%] mt-[18%]">
+    class="txt-cntnt fixed rounded-md border border-solid ml-[2.5%] border-yellow-400 border-3 w-[95%] h-[45%] mt-[18%] md:mt-[8%]">
     <div class="ml-auto rounded-tl-md rounded-tr-md mr-auto w-full h-[75%] bg-white text-black"> <ion-textarea
         class="w-full h-full" [(ngModel)]="textToRead" placeholder="Write your text here" [(ngModel)]="textToRead"
         rows="6" (click)="closeModals()"></ion-textarea> </div>
@@ -72,11 +101,24 @@
     </div>
   </div>
 
-  <div *ngIf="isOptionsOpen" class="fixed w-32 h-32 bg-[#000070] right-12 mt-[108%] rounded-md font-extrabold z-30">
+  <div *ngIf="showModalDelete">
+    <div
+      class="fixed top-1/3 ml-[5%] w-[90%] border border-solid border-yellow-400 border-3 h-28 bg-[#000070] z-50 rounded-md font-bold text-center">
+      <p class="mt-4">Voulez-vous vraiment supprimer ce texte ?</p>
+      <div class="h-[1px] w-full bg-yellow-400 mt-5"></div>
+
+      <div class="flex gap-40 ml-16 mt-3 text-[95%]">
+        <button class="text-red-700" (click)="openDeleteModal()">Non</button>
+        <button (click)="deleteText(selectedTextId)">Oui</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="isOptionsOpen" class="fixed w-32 h-24 bg-[#000070] right-12 mt-[108%] rounded-md font-extrabold z-30">
     <div class="ml-4">
-      <p class="mt-3">Lire</p>
-      <p class="mt-3">Publier</p>
-      <p class="mt-3 text-red-600">Supprimer</p>
+      <p class="mt-3" (click)="readTextSaved(contentOfSavedText)">Lire</p>
+      <p class="mt-3 text-red-600" (click)="openDeleteModal()">Supprimer</p>
     </div>
   </div>
 
@@ -86,7 +128,8 @@
         <div class="rounded-md flex bg-yellow-300 hover:cursor-pointer h-10 text-black my-2 font-extrabold py-2"
           (click)="setTextToRead(text.content)" (click)="closeModals()">
           <p class="ml-4">{{text.title}}</p>
-          <i class="ml-auto mr-5 text-xl fas fa-ellipsis-v" (click)="optionsTextOpen($event)" ></i>
+          <i class="ml-auto mr-5 text-xl fas fa-ellipsis-v" (click)="optionsTextOpen($event, text._id)"
+            (click)="loadContentOfSavedText(text.content)"></i>
         </div>
       </div>
     </div>

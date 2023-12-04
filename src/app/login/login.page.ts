@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { tap, catchError,map } from 'rxjs/operators';
+import { LoadingController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
@@ -17,7 +19,9 @@ export class LoginPage implements OnInit {
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+     private modalController: ModalController,
+    private loadingCtrl: LoadingController,
   ) {}
 
   ngOnInit() {
@@ -46,6 +50,7 @@ export class LoginPage implements OnInit {
         map((res) => res.token), // Extraction du token de la réponse
         tap((token) => {
           if (token) {
+            this.show()
             localStorage.setItem('token', token); // Sauvegarde du token dans le localStorage
             this.router.navigateByUrl('/home', { replaceUrl: true });
             console.log('Connected');
@@ -60,4 +65,18 @@ export class LoginPage implements OnInit {
       )
       .subscribe();
   }
-}
+
+
+show(){
+    this.loadingCtrl.create({
+     message: "Patientez svp..."
+    }).then(loading =>{
+     loading.present();
+
+     setTimeout(()=> {
+      loading.dismiss();
+     },3000);
+    })
+   }
+
+  }
