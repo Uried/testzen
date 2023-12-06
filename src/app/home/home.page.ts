@@ -29,6 +29,9 @@ export class HomePage {
   showLanguageSelection = false;
   showModalDelete: boolean = false;
   isLanguageSelectionVisible = false;
+  remainingText!: string;
+  currentPosition: number = 0;
+  isPaused: boolean = false;
 
   constructor(private router: Router, private http: HttpClient) {}
 
@@ -218,24 +221,29 @@ export class HomePage {
     this.isPublicDivVisible = !this.isPublicDivVisible;
   }
 
-  closeSaveNewPublicTextModal(){
-    this.isPublicDivVisible = false
+  closeSaveNewPublicTextModal() {
+    this.isPublicDivVisible = false;
   }
 
   speak() {
     this.isPlaying = !this.isPlaying;
 
-    return new Promise<void>((resolve) => {
-      responsiveVoice.speed = this.speed;
-      responsiveVoice.speak(this.textToRead, this.selectedVoice, {
-        onend: () => {
-          this.onEnd();
-          resolve();
-        },
-      });
-    });
+    if (this.isPlaying) {
+      if (this.remainingText) {
+        responsiveVoice.resume();
+      } else {
+        this.remainingText = this.textToRead.slice(this.currentPosition);
+        responsiveVoice.speak(this.remainingText, this.selectedVoice, {
+          onend: () => {
+            this.onEnd();
+          },
+        });
+      }
+    } else {
+      responsiveVoice.pause();
+      console.log('Texte restant à lire:', this.remainingText);
+    }
   }
-
   openMenu() {
     this.isOpenMenu = !this.isOpenMenu;
   }
@@ -321,9 +329,15 @@ export class HomePage {
   }
 
   onEnd() {
-    this.isPlaying = false;
+    if (this.isPlaying) {
+      console.log('Texte restant à lire:', this.remainingText);
+    } else {
+      console.log('Lecture terminée');
+      this.isPlaying = false; // Réinitialiser l'état de lecture
+      this.remainingText = ''; // Réinitialiser le texte restant à lire
+    }
   }
-
+  
   pause(): void {
     this.isPlaying = false;
 

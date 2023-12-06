@@ -1,4 +1,4 @@
-<ion-content class="h-full overflow-hidden text-w">
+<ion-content class="h-screen overflow-hidden text-white">
 
   <div class="flex fixed h-12 w-full text-blue-800">
     <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div>
@@ -16,6 +16,7 @@
       (click)="openMenu()"></i>
   </div>
 
+  <!-- Select language -->
   <div class="language-selection mt-5 ml-[64%] md:ml-[72.5%]  max-w-[25%] fixed">
     <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()" class="text-blue-900">
       <ion-select-option value="fr-FR">Français</ion-select-option>
@@ -88,7 +89,7 @@
   <div
     class="txt-cntnt fixed rounded-md border border-solid ml-[2.5%] border-yellow-400 border-3 w-[95%] h-[45%] mt-[18%] md:mt-[8%]">
     <div class="ml-auto rounded-tl-md rounded-tr-md mr-auto w-full h-[75%] bg-white text-black"> <ion-textarea
-        class="w-full h-full" [(ngModel)]="textToRead" placeholder="Write your text here" [(ngModel)]="textToRead"
+        class=" w-full h-full" [(ngModel)]="textToRead" placeholder="Write your text here" [(ngModel)]="textToRead"
         rows="6" (click)="closeModals()"></ion-textarea> </div>
 
     <div class="flex w-full md:w-96 items-center justify-center gap-10 mt-2">
