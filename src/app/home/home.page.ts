@@ -29,9 +29,6 @@ export class HomePage {
   showLanguageSelection = false;
   showModalDelete: boolean = false;
   isLanguageSelectionVisible = false;
-  remainingText!: string;
-  currentPosition: number = 0;
-  isPaused: boolean = false;
 
   constructor(private router: Router, private http: HttpClient) {}
 
@@ -228,22 +225,19 @@ export class HomePage {
   speak() {
     this.isPlaying = !this.isPlaying;
 
-    if (this.isPlaying) {
-      if (this.remainingText) {
-        responsiveVoice.resume();
-      } else {
-        this.remainingText = this.textToRead.slice(this.currentPosition);
-        responsiveVoice.speak(this.remainingText, this.selectedVoice, {
-          onend: () => {
-            this.onEnd();
-          },
-        });
-      }
-    } else {
-      responsiveVoice.pause();
-      console.log('Texte restant à lire:', this.remainingText);
-    }
+    return new Promise<void>((resolve) => {
+      responsiveVoice.speed = this.speed;
+      responsiveVoice.speak(this.textToRead, this.selectedVoice, {
+        onstart: () => {
+        },
+        onend: () => {
+          this.onEnd();
+          resolve();
+        },
+      });
+    });
   }
+
   openMenu() {
     this.isOpenMenu = !this.isOpenMenu;
   }
@@ -329,15 +323,9 @@ export class HomePage {
   }
 
   onEnd() {
-    if (this.isPlaying) {
-      console.log('Texte restant à lire:', this.remainingText);
-    } else {
-      console.log('Lecture terminée');
-      this.isPlaying = false; // Réinitialiser l'état de lecture
-      this.remainingText = ''; // Réinitialiser le texte restant à lire
-    }
+    this.isPlaying = false;
   }
-  
+
   pause(): void {
     this.isPlaying = false;
 
