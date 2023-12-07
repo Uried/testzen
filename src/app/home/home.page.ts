@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { franc } from '/home/fongang/test_project_OS/readForMe/node_modules/franc-min/index';
 
 declare var responsiveVoice: any;
 
@@ -15,17 +16,21 @@ export class HomePage {
   isPlaying: boolean = false;
   isOpenMenu: boolean = false;
   isOptionsOpen: boolean = false;
+  isSearchBarOpened: boolean = false;
   selectedTextId!: string;
   contentOfSavedText!: string;
   title!: string;
-  textToRead!: string;
+  searchTerm!: string;
+  textToRead: string = '';
   isPublic: boolean = false;
   isDivVisible = false;
   isPublicDivVisible = false;
   selectedLanguage: string = 'fr-FR';
-  selectedVoice: string = 'French Female';
+  selectedVoice: string = '';
   speed: number = 200;
+  alertEmptyContent: boolean = false;
   texts: any[] = [];
+  searchResults: any[] = [];
   showLanguageSelection = false;
   showModalDelete: boolean = false;
   isLanguageSelectionVisible = false;
@@ -48,6 +53,16 @@ export class HomePage {
           .get('https://apitest-psi.vercel.app/texts', { headers })
           .subscribe((data: any) => {
             this.texts = data.data;
+            this.texts.forEach((text: any) => {
+              //console.log(text);
+            });
+          });
+
+        this.http
+          .get('http://localhost:5500/publictexts/')
+          .subscribe((data: any) => {
+            const publicTexts = data.publicText;
+            this.texts = this.texts.concat(publicTexts);
             this.texts.forEach((text: any) => {
               console.log(text);
             });
@@ -157,8 +172,36 @@ export class HomePage {
     }
   }
 
+  searchTitles(): void {
+    this.http
+      .get<string[]>(
+        `https://apitest-psi.vercel.app/search?term=${encodeURIComponent(
+          this.searchTerm
+        )}`
+      )
+      .subscribe(
+        (texts) => {
+          this.searchResults = texts;
+          this.searchResults.forEach((searchResults: any) => {});
+          console.log(this.searchResults);
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+  }
+
+  loadTextSearched(textSearchedContent: string) {
+    this.textToRead = textSearchedContent;
+    this.isSearchBarOpened = !this.isSearchBarOpened;
+  }
+
   closeSaveNewTextModal() {
     this.isDivVisible = false;
+  }
+
+  openSearchBar() {
+    this.isSearchBarOpened = !this.isSearchBarOpened;
   }
 
   loadContentOfSavedText(savedTextContent: string) {
@@ -182,41 +225,59 @@ export class HomePage {
   }
 
   saveNewText() {
-    let text = {
-      title: this.title,
-      content: this.textToRead,
-    };
+    this.getFirstFiveWords();
 
-    try {
-      this.http
-        .post('https://apitest-psi.vercel.app/texts/', text)
-        .subscribe((res) => {
-          console.log('Saved');
-          this.getMyTexts(); // actualiser la liste
-        });
-    } catch (error: any) {
-      console.log(error.message);
+    if (!this.textToRead) {
+      this.isDivVisible = !this.isDivVisible;
+      this.alertEmptyContent = !this.alertEmptyContent;
+    } else {
+      let text = {
+        title: this.title,
+        content: this.textToRead,
+      };
+
+      try {
+        this.http
+          .post('https://apitest-psi.vercel.app/texts/', text)
+          .subscribe((res) => {
+            console.log('Saved');
+            this.getMyTexts(); // actualiser la liste
+          });
+      } catch (error: any) {
+        console.log(error.message);
+      }
+      this.isDivVisible = !this.isDivVisible;
     }
-
-    this.isDivVisible = !this.isDivVisible;
   }
 
   saveNewPublicText() {
-    let text = {
-      title: this.title,
-      content: this.textToRead,
-      isPublic: (this.isPublic = true),
-    };
-    try {
-      this.http
-        .post('https://apitest-psi.vercel.app/texts/', text)
-        .subscribe((res) => {
-          console.log('Saved');
-        });
-    } catch (error: any) {
-      console.log(error.message);
+    this.getFirstFiveWords();
+    if (!this.textToRead) {
+      this.isDivVisible = !this.isDivVisible;
+      this.alertEmptyContent = !this.alertEmptyContent;
+    } else {
+      let text = {
+        title: this.title,
+        content: this.textToRead,
+        isPublic: (this.isPublic = true),
+      };
+
+      try {
+        this.http
+          .post('https://apitest-psi.vercel.app/texts/', text)
+          .subscribe((res) => {
+            console.log(text);
+          });
+      } catch (error: any) {
+        console.log(error.message);
+      }
+      this.isDivVisible = !this.isDivVisible;
     }
-    this.isPublicDivVisible = !this.isPublicDivVisible;
+  }
+
+  getFirstFiveWords(): void {
+    const words = this.textToRead.split(' ');
+    this.title = words.slice(0, 4).join(' ');
   }
 
   closeSaveNewPublicTextModal() {
@@ -229,8 +290,9 @@ export class HomePage {
       if (this.remainingText !== '') {
         responsiveVoice.resume();
       } else {
-        this.remainingText = this.textToRead.slice(this.currentPosition);
-        responsiveVoice.speak(this.remainingText, this.selectedVoice, {
+        let detectedLanguage = franc(this.textToRead);
+        this.selectedVoice = this.getVoiceForLanguage(detectedLanguage);
+        responsiveVoice.speak(this.textToRead, this.selectedVoice, {
           onend: () => {
             this.onEnd();
           },
@@ -239,6 +301,36 @@ export class HomePage {
     } else {
       responsiveVoice.pause();
     }
+  }
+
+  closeAlertEmptyContentModal() {
+    this.alertEmptyContent = false;
+  }
+
+  getVoiceForLanguage(languageCode: string): string {
+    // Correspondance entre les codes de langue et les voix disponibles
+    const voiceMap: { [key: string]: string } = {
+      eng: 'US English Female',
+      fra: 'French Female',
+      spa: 'Spanish Female',
+      deu: 'Deutsch Female',
+      ita: 'Italian Female',
+      nld: 'Dutch Female',
+      por: 'Brazilian Portuguese Female',
+      rus: 'Russian Female',
+      swe: 'Swedish Female',
+      dan: 'Danish Female',
+      nor: 'Norwegian Female',
+      fin: 'Finnish Female',
+      pol: 'Polish Female',
+      tur: 'Turkish Female',
+      ell: 'Greek Female',
+      hun: 'Hungarian Female',
+      ces: 'Czech Female',
+      zho: 'Chinese Female',
+      jpn: 'Japanese Female',
+    };
+    return voiceMap[languageCode];
   }
 
   openMenu() {
@@ -253,6 +345,7 @@ export class HomePage {
     this.isOpenMenu = false;
     this.isOptionsOpen = false;
     this.isPublicDivVisible = false;
+    this.alertEmptyContent = false;
   }
 
   optionsTextOpen(event: MouseEvent, idText: string) {
@@ -285,9 +378,7 @@ export class HomePage {
       .subscribe();
     this.showModalDelete = !this.showModalDelete;
   }
-  writeTitle() {
-    // Handle input click event if needed
-  }
+  
 
   toggleDivVisibility() {
     this.isDivVisible = !this.isDivVisible;
@@ -327,18 +418,23 @@ export class HomePage {
 
   onEnd() {
     if (this.isPlaying) {
-      responsiveVoice.cancel()
-       this.isPlaying = false; // Réinitialiser l'état de lecture
-       this.remainingText = '';
-       console.log('Texte restant à lire:', this.remainingText);
-       this.isPlaying = false;
-    } 
+      responsiveVoice.cancel();
+      this.isPlaying = false; // Réinitialiser l'état de lecture
+      this.remainingText = '';
+      console.log('Texte restant à lire:', this.remainingText);
+      this.isPlaying = false;
+    }
   }
 
   pause(): void {
     this.isPlaying = false;
 
     responsiveVoice.pause();
+  }
+
+  logout(): void {
+    localStorage.clear();
+    this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 
   stop(): void {

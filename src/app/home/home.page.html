@@ -3,7 +3,7 @@
   <div class="flex fixed h-12 w-full text-blue-800">
     <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div>
     <input class="hidden mt-3 rounded-full bg-white md:flex ml-[42%]" type="text">
-    <i class="text-blue-800 text-2xl ml-[20%] md:ml-[3%] mt-3 fas fa-search"></i>
+    <i class="text-blue-800 text-2xl ml-[20%] md:ml-[3%] mt-3 fas fa-search" (click)="openSearchBar()"></i>
     <i class="text-blue-800 text-3xl md:ml-[10%] ml-[10%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
     <div class="md:flex md:mt-3 md:gap-8 md:ml-[5%] font-bold hidden">
       <p class="">Historique</p>
@@ -15,6 +15,25 @@
       [ngClass]="{'fa-bars': !isOpenMenu, 'fa-times': isOpenMenu, 'text-2xl md:hidden text-blue-800 mt-2 ml-10': true}"
       (click)="openMenu()"></i>
   </div>
+
+  <div *ngIf="isSearchBarOpened" class="fixed w-[95%] h-[55%] bg-blue-900 z-20 mt-[4%] rounded-md ml-[2.5%]">
+    <div class="flex">
+      <div class="'flex bg-white h-8 w-[83%] ml-[5%] mt-4 rounded-full">
+        <i class="text-blue-800 text-2xl ml-[3%] md:ml-[3%] fas fa-search"></i>
+        <input type="text" class="w-60 ml-2 py-2 h-6 border-none outline-none bg-white text-black"
+          [(ngModel)]="searchTerm" (input)="searchTitles()">
+      </div>
+      <div class="mt-4" (click)="openSearchBar()"><i class="text-yellow-400 text-2xl ml-[90%] fas fa-times"></i></div>
+    </div>
+
+    <div class="w-[85%] mt-5 mr-auto ml-auto custom-scroll-item max-h-48 overflow-y-auto">
+      <div class="font-bold text-yellow-400 h-48">
+        <p *ngFor="let text of searchResults" class="py-2" (click)="loadTextSearched(text.content)">{{ text.title}}</p>
+      </div>
+    </div>
+
+  </div>
+
 
   <!-- Select language -->
   <div class="language-selection mt-5 ml-[64%] md:ml-[72.5%]  max-w-[25%] fixed">
@@ -53,35 +72,32 @@
     </div>
     <div class="flex mt-4 ml-2 gap-3">
       <i class="text-red-600 fas fa-sign-out-alt py-1"></i>
-      <p class="font-bold text-white">Déconnexion</p>
+      <p class="font-bold text-white" (click)="logout()">Déconnexion</p>
     </div>
   </div>
 
 
-  <ng-container *ngIf="isDivVisible">
-    <div class="fixed w-72 h-36 mt-44 ml-10 text-white rounded-md bg-[#000070] border border-solid border-yellow-400 border-3 z-50">
-      <label class="ml-5 font-extrabold" for="">Titre</label><br />
-      <input [(ngModel)]="title"
-        class="bg-white text-xl rounded-md focus:border border-yellow-400 border-2 text-black w-[85%] ml-5 mt-3"
-        type="text" (click)="writeTitle()">
+  <ng-container *ngIf="alertEmptyContent">
+    <div
+      class="fixed w-72 h-36 mt-44 ml-10 text-white rounded-md bg-[#000070] border border-solid border-yellow-400 border-3 z-50">
+      <p class="ml-5 font-extrabold mt-4">Veuillez remplir votre champ de texte</p><br />
+
       <div class="h-[1px] w-full bg-yellow-400 mt-5"></div>
-      <div class="flex gap-24 ml-6 mt-3 text-[98%] font-bold">
-        <button class="text-red-700" (click)="closeSaveNewTextModal()">Annuler</button>
-        <button (click)="saveNewText()">Sauvegarder</button>
+      <div class="flex gap-24text-[98%] mt-1 font-bold text-yellow-400">
+        <button class=" mr-auto ml-auto" (click)="closeAlertEmptyContentModal()">OK</button>
       </div>
     </div>
   </ng-container>
 
-  <ng-container *ngIf="isPublicDivVisible">
-    <div class="fixed w-72 h-36 mt-44 ml-10 text-white rounded-md bg-[#000070] border border-solid border-yellow-400 border-3 z-50">
-      <label class="ml-5 font-extrabold" for="">Titre</label><br />
-      <input [(ngModel)]="title"
-        class="bg-white text-xl rounded-md focus:border border-yellow-400 border-2 text-black w-[85%] ml-5 mt-3" type="text"
-        (click)="writeTitle()">
+  <ng-container *ngIf="isDivVisible">
+    <div
+      class="fixed w-72 h-36 mt-44 ml-10 text-white rounded-md bg-[#000070] border border-solid border-yellow-400 border-3 z-50">
+      <p class="ml-5 font-extrabold mt-4">Voulez-vous que votre texte soit public ou privé ?</p><br />
+
       <div class="h-[1px] w-full bg-yellow-400 mt-5"></div>
-      <div class="flex gap-24 ml-6 mt-3 text-[98%] font-bold">
-        <button class="text-red-700" (click)="closeSaveNewPublicTextModal()">Annuler</button>
-        <button (click)="saveNewPublicText()">Sauvegarder</button>
+      <div class="flex gap-24 ml-12 text-[98%] mt-1 font-bold text-yellow-400">
+        <button class="" (click)="saveNewPublicText()">Public</button>
+        <button (click)="saveNewText()">Privé</button>
       </div>
     </div>
   </ng-container>
@@ -92,12 +108,11 @@
         class="w-full h-full" [(ngModel)]="textToRead" placeholder="Write your text here" [(ngModel)]="textToRead"
         rows="6" (click)="closeModals()"></ion-textarea> </div>
 
-    <div class="flex w-full md:w-96 items-center justify-center gap-10 mt-2">
-      <i class="text-2xl text-yellow-400 fas fa-save" (click)="writeTitle()" (click)="toggleDivVisibility()"></i>
-      <button class="read w-16 bg-yellow-400 text-black h-16 ml-6 rounded-full" expand="full" (click)="speak()">
+    <div class="flex w-full md:w-96 items-center justify-center gap-16 mt-2">
+      <i class="text-2xl text-yellow-400 fas fa-save"(click)="toggleDivVisibility()"></i>
+      <button class="read w-16 bg-yellow-400 text-black h-16  rounded-full" expand="full" (click)="speak()">
         <i class="fas" [ngClass]="{'fa-play': !isPlaying, 'fa-pause': isPlaying, 'text-2xl': true}"></i>
       </button>
-      <i class="text-2xl text-yellow-400 fas fa-paper-plane" (click)="togglePublicDivVisibility()"></i>
       <i class="text-2xl text-yellow-400 fas fa-plus" (click)="addNewText()"></i>
     </div>
   </div>
