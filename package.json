@@ -36,6 +36,7 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "vercel": "^32.6.1",
+    "yandex-translate-api-wrapper": "^1.0.0",
     "zone.js": "~0.14.2"
   },
   "devDependencies": {

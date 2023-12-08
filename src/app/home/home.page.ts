@@ -204,31 +204,31 @@ export class HomePage {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-   try {
-     const token = localStorage.getItem('token');
-     const headers = new HttpHeaders({
-       Authorization: `Bearer ${token}`,
-     });
+    try {
+      const token = localStorage.getItem('token');
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
 
-     const textsRequest = this.http.get(
-       `https://apitest-psi.vercel.app/${this.jId}`,
-       { headers }
-     );
-     const publicTextsRequest = this.http.get(
-       'https://apitest-psi.vercel.app/publictexts/'
-     );
+      const textsRequest = this.http.get(
+        `https://apitest-psi.vercel.app/${this.jId}`,
+        { headers }
+      );
+      const publicTextsRequest = this.http.get(
+        'https://apitest-psi.vercel.app/publictexts/'
+      );
 
-     forkJoin([textsRequest, publicTextsRequest]).subscribe(
-       (results: any[]) => {
-         const textsData = results[0].data;
-         const publicTextsData = results[1].publicText;
+      forkJoin([textsRequest, publicTextsRequest]).subscribe(
+        (results: any[]) => {
+          const textsData = results[0].data;
+          const publicTextsData = results[1].publicText;
 
-         this.texts = [...textsData, ...publicTextsData];
-       }
-     );
-   } catch (error: any) {
-     console.log(error.message);
-   }
+          this.texts = [...textsData, ...publicTextsData];
+        }
+      );
+    } catch (error: any) {
+      console.log(error.message);
+    }
   }
 
   getPublicTexts() {
@@ -366,8 +366,9 @@ export class HomePage {
         responsiveVoice.resume();
       } else {
         let detectedLanguage = franc(this.textToRead);
+        this.remainingText = this.textToRead.slice(this.currentPosition);
         this.selectedVoice = this.getVoiceForLanguage(detectedLanguage);
-        responsiveVoice.speak(this.textToRead, this.selectedVoice, {
+        responsiveVoice.speak(this.remainingText, this.selectedVoice, {
           onend: () => {
             this.onEnd();
           },
@@ -410,6 +411,10 @@ export class HomePage {
 
   openMenu() {
     this.isOpenMenu = !this.isOpenMenu;
+  }
+
+  openTranslator(){
+
   }
 
   toggleLanguageSelection() {

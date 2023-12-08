@@ -4,7 +4,7 @@
     <div class="h-full font-extrabold text-2xl text-black ml-2 py-3 w-18">Read4Me</div>
     <input class="hidden mt-3 rounded-full bg-white md:flex ml-[42%]" type="text">
     <i class="text-blue-800 text-2xl ml-[20%] md:ml-[3%] mt-3 fas fa-search" (click)="openSearchBar()"></i>
-    <i class="text-blue-800 text-3xl md:ml-[10%] ml-[10%] mt-2 fas fa-language" (click)="toggleLanguageSelection()"></i>
+    <i class="text-blue-800 text-3xl md:ml-[10%] ml-[10%] mt-2 fas fa-exchange-alt" (click)="openTranslator()"></i>
     <div class="md:flex md:mt-3 md:gap-8 md:ml-[5%] font-bold hidden">
       <p class="">Historique</p>
       <p class="">Parametres</p>
@@ -36,7 +36,7 @@
 
 
   <!-- Select language -->
-  <div class="language-selection mt-5 ml-[64%] md:ml-[72.5%]  max-w-[25%] fixed">
+  <!-- <div class="language-selection mt-5 ml-[64%] md:ml-[72.5%]  max-w-[25%] fixed">
     <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()" class="text-blue-900">
       <ion-select-option value="fr-FR">Français</ion-select-option>
       <ion-select-option value="en-US">English</ion-select-option>
@@ -58,7 +58,7 @@
       <ion-select-option value="hu-HU">Magyar</ion-select-option>
       <ion-select-option value="cs-CZ">Čeština</ion-select-option>
     </ion-select>
-  </div>
+  </div> -->
 
   <div *ngIf="isOpenMenu" class="fixed right-0 mt-10 w-40 h-36 rounded-br-md rounded-bl-md bg-[#000070] z-30"
     [ngClass]="{'translate-x-0': isOpenMenu, '-translate-x-full': !isOpenMenu}">

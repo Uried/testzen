@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Page de traduction</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label position="floating">Texte à traduire</ion-label>
+    <ion-textarea [(ngModel)]="textToTranslate" rows="6"></ion-textarea>
+  </ion-item>
+
+  <ion-item class="language-selection">
+    <ion-label>Langue de traduction</ion-label>
+    <ion-select [(ngModel)]="selectedLanguage">
+      <ion-select-option value="fr-FR">Anglais</ion-select-option>
+      <ion-select-option value="en-US">Français</ion-select-option>
+      <ion-select-option value="es-ES">Espagnol</ion-select-option>
+      <!-- Ajoutez d'autres options de langues ici -->
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="full" (click)="translate()">Traduire</ion-button>
+
+  <ion-item>
+    <ion-label>Résultat de la traduction</ion-label>
+    <ion-textarea [(ngModel)]="translatedText" rows="6" readonly></ion-textarea>
+  </ion-item>
+
+  <ion-button expand="full" (click)="saveTranslation()">Enregistrer</ion-button>
+</ion-content>
