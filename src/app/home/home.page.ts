@@ -3,7 +3,12 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { forkJoin } from 'rxjs';
+import { throwError, map } from 'rxjs';
 import { franc } from '/home/fongang/test_project_OS/readForMe/node_modules/franc-min/index';
+import { ActivatedRoute} from '@angular/router';
+import { AuthService } from '../login/services/auth.service';
+
 
 declare var responsiveVoice: any;
 
@@ -13,6 +18,9 @@ declare var responsiveVoice: any;
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  pseudo!: string;
+  phone!: string;
+  jId!: string;
   isPlaying: boolean = false;
   isOpenMenu: boolean = false;
   isOptionsOpen: boolean = false;
@@ -36,40 +44,51 @@ export class HomePage {
   isLanguageSelectionVisible = false;
   remainingText: string = '';
   currentPosition: number = 0;
-  constructor(private router: Router, private http: HttpClient) {}
+
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private http: HttpClient
+  ) {}
 
   ngOnInit() {
-    const token = localStorage.getItem('token');
+    this.route.queryParams.subscribe((params) => {
+      this.pseudo = params['pseudo'];
+      this.phone = params['phone'];
+      this.jId = params['jId'];
+    });
 
-    if (!token) {
-      window.location.href = '/login';
+    if (this.jId && this.phone && this.pseudo) {
+      this.login(this.pseudo, this.phone);
     } else {
+      this.router.navigateByUrl('/login');
+    }
+
+    try {
+      const token = localStorage.getItem('token');
       const headers = new HttpHeaders({
         Authorization: `Bearer ${token}`,
       });
 
-      try {
-        this.http
-          .get('https://apitest-psi.vercel.app/texts', { headers })
-          .subscribe((data: any) => {
-            this.texts = data.data;
-            this.texts.forEach((text: any) => {
-              //console.log(text);
-            });
-          });
+      const textsRequest = this.http.get(
+        `https://apitest-psi.vercel.app/texts/${this.jId}`,
+        { headers }
+      );
+      const publicTextsRequest = this.http.get(
+        'https://apitest-psi.vercel.app/publictexts/'
+      );
 
-        this.http
-          .get('http://localhost:5500/publictexts/')
-          .subscribe((data: any) => {
-            const publicTexts = data.publicText;
-            this.texts = this.texts.concat(publicTexts);
-            this.texts.forEach((text: any) => {
-              console.log(text);
-            });
-          });
-      } catch (error: any) {
-        console.log(error.message);
-      }
+      forkJoin([textsRequest, publicTextsRequest]).subscribe(
+        (results: any[]) => {
+          const textsData = results[0].data;
+          const publicTextsData = results[1].publicText;
+
+          this.texts = [...textsData, ...publicTextsData];
+        }
+      );
+    } catch (error: any) {
+      console.log(error.message);
     }
   }
 
@@ -147,6 +166,31 @@ export class HomePage {
     responsiveVoice.setLanguage(this.selectedLanguage);
   }
 
+  login(pseudo: string, phone: string) {
+    let credentials = {
+      pseudo: this.pseudo,
+      phone: this.phone,
+    };
+    this.authService
+      .login(credentials)
+      .pipe(
+        map((res: any) => res.token), // Extraction du token de la réponse
+        tap((token: any) => {
+          if (token) {
+            localStorage.setItem('token', token); // Sauvegarde du token dans le localStorage
+            console.log('Connected');
+          } else {
+            console.log('Token not found in the response.');
+          }
+        }),
+        catchError((error) => {
+          console.log(error.message);
+          return throwError(() => error);
+        })
+      )
+      .subscribe();
+  }
+
   setTextToRead(content: string): void {
     this.textToRead = content;
   }
@@ -160,11 +204,40 @@ export class HomePage {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
+   try {
+     const token = localStorage.getItem('token');
+     const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`,
+     });
+
+     const textsRequest = this.http.get(
+       `https://apitest-psi.vercel.app/${this.jId}`,
+       { headers }
+     );
+     const publicTextsRequest = this.http.get(
+       'https://apitest-psi.vercel.app/publictexts/'
+     );
+
+     forkJoin([textsRequest, publicTextsRequest]).subscribe(
+       (results: any[]) => {
+         const textsData = results[0].data;
+         const publicTextsData = results[1].publicText;
+
+         this.texts = [...textsData, ...publicTextsData];
+       }
+     );
+   } catch (error: any) {
+     console.log(error.message);
+   }
+  }
+
+  getPublicTexts() {
     try {
       this.http
-        .get('https://apitest-psi.vercel.app/texts', { headers })
+        .get('https://apitest-psi.vercel.app/publictexts/')
         .subscribe((data: any) => {
-          this.texts = data.data;
+          const publicTexts = data.publicText;
+          this.texts = this.texts.concat(publicTexts);
           this.texts.forEach((text: any) => {});
         });
     } catch (error: any) {
@@ -177,7 +250,7 @@ export class HomePage {
       .get<string[]>(
         `https://apitest-psi.vercel.app/search?term=${encodeURIComponent(
           this.searchTerm
-        )}`
+        )}&jId=${encodeURIComponent(this.jId)}`
       )
       .subscribe(
         (texts) => {
@@ -234,6 +307,7 @@ export class HomePage {
       let text = {
         title: this.title,
         content: this.textToRead,
+        jId: this.jId,
       };
 
       try {
@@ -259,6 +333,7 @@ export class HomePage {
       let text = {
         title: this.title,
         content: this.textToRead,
+        jId: this.jId,
         isPublic: (this.isPublic = true),
       };
 
@@ -266,7 +341,7 @@ export class HomePage {
         this.http
           .post('https://apitest-psi.vercel.app/texts/', text)
           .subscribe((res) => {
-            console.log(text);
+            this.getMyTexts();
           });
       } catch (error: any) {
         console.log(error.message);
@@ -277,7 +352,7 @@ export class HomePage {
 
   getFirstFiveWords(): void {
     const words = this.textToRead.split(' ');
-    this.title = words.slice(0, 4).join(' ');
+    this.title = words.slice(0, 3).join(' ');
   }
 
   closeSaveNewPublicTextModal() {
@@ -378,7 +453,6 @@ export class HomePage {
       .subscribe();
     this.showModalDelete = !this.showModalDelete;
   }
-  
 
   toggleDivVisibility() {
     this.isDivVisible = !this.isDivVisible;

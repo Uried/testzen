@@ -25,17 +25,7 @@ export class LoginPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
-      this.pseudo = params['pseudo'];
-      this.phone = params['phone'];
-      this.jId = params['jId'];
-    });
 
-    if (this.jId && this.phone && this.pseudo) {
-      this.login(this.pseudo, this.phone);
-    } else {
-      this.router.navigateByUrl('/login');
-    }
    }
 
   login(pseudo: string, phone: string) {
@@ -50,7 +40,6 @@ export class LoginPage implements OnInit {
         map((res) => res.token), // Extraction du token de la réponse
         tap((token) => {
           if (token) {
-            this.show()
             localStorage.setItem('token', token); // Sauvegarde du token dans le localStorage
             this.router.navigateByUrl('/home', { replaceUrl: true });
             console.log('Connected');
